@@ -194,10 +194,12 @@ xon
 		G01_GCPIOCPMTMQP <- Quandl("RBA/G01_GCPIOCPMTMQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date) %>% rename(G01_GCPIOCPMTMQP = "Quarterly trimmed mean inflation. Units: Per cent; Series ID: GCPIOCPMTMQP")
 
 		'Inflation excl. volatile items
-		G01_GCPIXVIQP <- Quandl("RBA/G01_GCPIXVIQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date) %>% rename(G01_GCPIXVIQP = "Quarterly inflation excluding volatile items. Units: Per cent; Series ID: GCPIXVIQP")
+		G01_GCPIXVIQP <- Quandl("RBA/G01_GCPIXVIQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date)
+		names(G01_GCPIXVIQP)[2] <- "G01_GCPIXVIQP"
 
-		'Inflation Expectations - Break-even 10-year inflation rate (converted to qtly)
-		G03_GBONYLD <- Quandl("RBA/G03_GBONYLD") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>%  rename(date = Date) %>%  rename(value = "Break-even 10-year inflation rate. Units: Per cent ; Series ID: GBONYLD") %>% mutate(G03_GBONYLD = ((1+value/100)^(1/4)-1)*100) %>%  dplyr::select(date, G03_GBONYLD)
+		'Inflation excl. interest charges and GST
+		G01_GCPIEITCQP <- Quandl("RBA/G01_GCPIEITCQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date)
+		names(G01_GCPIEITCQP)[2] <- "G01_GCPIEITCQP"
 
 		'Other Inflation Expectation Series
 		g3_tables <- rba_search(pattern = "Expectations")
