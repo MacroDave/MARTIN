@@ -520,7 +520,7 @@ smpl @first %nataccs_end
 
 	'Exports Services Deflator
 	smpl 1985q1 %nataccs_end
-	equation _PXS.LS(COV=HAC) D(LOG(PXS))=C(1)+C(99)*( LOG(PXS(-1))-1*LOG(PC)-(1-1)*LOG(PM(-1))- C(3)*PXS_TREND_1/100- C(4)*PXS_TREND_2/100)+C(31)*D(LOG(PC))+(1 - C(31))*D(LOG(PXS(-1)))
+	equation _PXS.LS(COV=HAC) D(LOG(PXS))=C(1)+C(99)*( LOG(PXS(-1))-1*LOG(PC(-1))-(1-1)*LOG(PM(-1))- C(3)*PXS_TREND_1/100- C(4)*PXS_TREND_2/100)+C(31)*D(LOG(PC))+(1 - C(31))*D(LOG(PXS(-1)))
 	MARTIN.merge _PXS
 	MARTIN.addassign(i,c) PXS
 
