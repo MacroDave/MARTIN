@@ -1,6 +1,7 @@
 ''*******************************************************************
 'Run Sims for All Model Variables
 ''*******************************************************************
+logmode all
 ' Set current eviews directory
 close @wf
 %path = @runpath

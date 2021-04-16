@@ -69,8 +69,8 @@ xpackage lubridate
 xpackage tidyverse
 xpackage zoo
 xpackage Quandl
-xpackage raustats
 xpackage data.table
+xpackage readrba
 xpackage httr
 
 xrun httr::set_config(config(ssl_verifypeer = FALSE)) 'Sometimes needed for work/office connection issues
@@ -84,12 +84,13 @@ xon
 	abs_6401 <- read_abs("6401.0", tables = c("7"))
 	abs_5302 <- read_abs("5302.0", tables = c("1", "4","5","6", "8"))
 	abs_5204 <- read_abs("5204.0", tables = c("56", "58"))
-	abs_5625 <- read_abs("5625.0", tables = c("1e", "3b"))
+'	abs_5625 <- read_abs("5625.0", tables = c("1e", "3b"))
+	abs_5625 <- read_abs(series_id = c("A3515959C", "A3515137T"))
 	abs_6202 <- read_abs("6202.0", tables = c("1", "19"))
 	abs_6345 <- read_abs("6345.0", tables = c("1"))
 	abs_6457 <- read_abs("6457.0", tables = c("4"))
 	abs_6416 <- read_abs("6416.0", tables = c("1", "8"))
-	abs_5232 <- read_abs("5232.0", tables = c("34"))
+	abs_5232 <- read_abs("5232.0", tables = c("35"))
 	abs_1364 <- read_abs("1364.0.15.003")
 
 	'---------------------------------------------------------------------------------------------------------		
@@ -196,20 +197,23 @@ xon
 		'Inflation excl. volatile items
 		G01_GCPIXVIQP <- Quandl("RBA/G01_GCPIXVIQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date)
 		names(G01_GCPIXVIQP)[2] <- "G01_GCPIXVIQP"
+		' %>% rename(G01_GCPIXVIQP = "Quarterly inflation excluding volatile items. Units: Per cent; Series ID: GCPIXVIQP")
 
-		'Inflation excl. interest charges and GST
-		G01_GCPIEITCQP <- Quandl("RBA/G01_GCPIEITCQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date)
-		names(G01_GCPIEITCQP)[2] <- "G01_GCPIEITCQP"
+		'Inflation Expectations - Break-even 10-year inflation rate (converted to qtly)
+		G03_GBONYLD <- Quandl("RBA/G03_GBONYLD") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>%  rename(date = Date) %>%  rename(value = "Break-even 10-year inflation rate. Units: Per cent ; Series ID: GBONYLD") %>% mutate(G03_GBONYLD = ((1+value/100)^(1/4)-1)*100) %>%  dplyr::select(date, G03_GBONYLD)
 
 		'Other Inflation Expectation Series
-		g3_tables <- rba_search(pattern = "Expectations")
-		rba_g3 <- rba_stats(url = g3_tables$url)
+'		g3_tables <- rba_search(pattern = "Expectations")
+'		rba_g3 <- rba_stats(url = g3_tables$url)
+		rba_g3 <- read_rba(series_id = c("GBUSEXP", "GUNIEXPY", "GUNIEXPYY", "GMAREXPY", "GMAREXPYY", "GBONYLD")) 
 		R_g3 <- rba_g3 %>% filter(series_id %in% c("GBUSEXP", "GUNIEXPY", "GUNIEXPYY", "GMAREXPY", "GMAREXPYY", "GBONYLD")) %>% mutate(date = zoo::as.yearqtr(date)) %>% dplyr::select(date, series_id, value)
 		R_g3 <- distinct(R_g3,date,series_id, .keep_all= TRUE)
 		R_g3 <- dcast(R_g3, date ~ series_id)
 
 		'Inflation excl. interest charges and GST
-		G01_GCPIEITCQP <- Quandl("RBA/G01_GCPIEITCQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date) %>% rename(G01_GCPIEITCQP = "Quarterly inflation excluding interest and tax changes. Units: Per cent; Series ID: GCPIEITCQP")
+		G01_GCPIEITCQP <- Quandl("RBA/G01_GCPIEITCQP", type = "raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date)
+		names(G01_GCPIEITCQP)[2] <- "G01_GCPIEITCQP"
+' %>% rename(G01_GCPIEITCQP = "Quarterly inflation excluding interest and tax changes. Units: Per cent; Series ID: GCPIEITCQP")
 
 '------------------------------------------------------------------------------------------------------------------------------------------------
 ' Join series together at a Qtly Frequency
@@ -226,13 +230,13 @@ xget(type=series) R_5204
 
 xclose
 
-
 '********************************************************************************
 'Commodity Prices
 '********************************************************************************
 pagecreate(page=commprices) m 1960m01 2099m12
-%url = "http://pubdocs.worldbank.org/en/561011486076393416/CMO-Historical-Data-Monthly.xlsx"
-import %url range="Monthly Indices"
+'%url = "http://pubdocs.worldbank.org/en/561011486076393416/CMO-Historical-Data-Monthly.xlsx"
+'import %url range="Monthly Indices"
+import .\..\data\CMO-Historical-Data-Monthly.xlsx range = "Monthly Indices"
 rename agriculture_iagriculture WPAG
 rename energy_ienergy WPCOM
 copy(c=a) commprices\WPAG Rqtly\*
