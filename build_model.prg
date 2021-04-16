@@ -3,7 +3,6 @@
 ' Programmer: David Stephan (david.stephan@gmail.com)
 ' Last Updated: November 5, 2019
 '**********************************************************************************************
-
 close @all
 %path=@runpath
 cd %path
@@ -14,7 +13,8 @@ cd %path
 %solve_start="2017q2"
 %solve_end="2099q4"
 !solve_stop = @val(%solve_end)
-%NATACCS_end="2019q2"
+%eq_est_end = "2019q4" 'last period of sample for equation estimation
+%NATACCS_end="2020q4" 'last quarter of national accounts data
 %modelname="MARTIN"
 
 '**********************************************************************************************
@@ -32,8 +32,8 @@ cd %path
 '**********************************************************************************************
 'Enter API Keys for Downloading Data from Quandl and FRED
 'Register at Quandl and FRED websites for API keys
-%FRED = "ZZZ"
-%QUANDL = "ZZZ"
+%FRED = "819674707cc9b3a42385749283aacc6e"
+%QUANDL = "c8j3mjrA43ToLv5yKYnv"
 
 '**********************************************************************************************
 
@@ -114,5 +114,4 @@ if !run_sims = 1 then
 	include .\programs\run_sims.prg
 	stop
 endif
-
 
