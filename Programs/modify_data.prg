@@ -8,6 +8,24 @@ smpl @all
 'Create Model Variables
 '************************************************************************************************
 
+'Extend Inflation Expectations / NAIRU 
+	'Extend to end of file
+	smpl @all
+	!obs = @obs(PI_E)
+	smpl if PI_E<>na
+	%lastdate=@otods(!obs)
+	smpl %lastdate+1 @last
+	PI_E=PI_E(-1)
+
+	smpl @all
+	!obs = @obs(TLUR)
+	smpl if TLUR<>na
+	%lastdate=@otods(!obs)
+	smpl %lastdate+1 @last
+	TLUR = TLUR(-1)
+
+	smpl @all
+
 'Adjust PEX for RBA Adjustments in 07q4 -> 10q3
 smpl 2007q4 2010q3
 PEX =  PEX_MARTIN/PEX_MARTIN(-1)*100-100
@@ -302,22 +320,6 @@ series iad = rc^iad_w_c*ib^iad_w_i*gi^iad_w_gi*gc^iad_w_gc*x^iad_w_x
 		N2R = N2R(1)+(N2R_MARTIN-N2R_MARTIN(1))
 		N10R = N10R(1)+(N10R_MARTIN-N10R_MARTIN(1))
 	next
-
-'Inflation Expectations / NAIRU 
-	'Extend to end of file
-	smpl @all
-	!obs = @obs(PI_E)
-	smpl if PI_E<>na
-	%lastdate=@otods(!obs)
-	smpl %lastdate+1 @last
-	PI_E=PI_E(-1)
-
-	smpl @all
-	!obs = @obs(TLUR)
-	smpl if TLUR<>na
-	%lastdate=@otods(!obs)
-	smpl %lastdate+1 @last
-	TLUR = TLUR(-1)
 
 smpl @all
 

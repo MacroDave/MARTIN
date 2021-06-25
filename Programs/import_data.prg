@@ -182,8 +182,11 @@ xon
 		'Trade Weighted Exchange Rate - Daily
 		FXRTWI <- Quandl("RBA/FXRTWI", type="raw") %>% rename(FXRTWI = Value) %>% group_by(date=floor_date(Date, "quarter")) %>% summarize(FXRTWI=mean(FXRTWI)) %>% mutate(date = zoo::as.yearqtr(date))
 		
-		'Weighted Average Business Lending Rate 'qtly
-		F05_FILRLBWAV <- Quandl("RBA/F05_FILRLBWAV", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRLBWAV = "Lending rates; Large business; Weighted-average rate on credit outstanding; Variable. Units: Per cent per annum; Series ID: FILRLBWAV") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRLBWAV=mean(F05_FILRLBWAV)) %>% mutate(date = zoo::as.yearqtr(date))    
+		'Weighted Average Business Lending Rate 'qtly - #### NO LONGER UPDATED ON RBA WEBSITE ####
+'		F05_FILRLBWAV <- Quandl("RBA/F05_FILRLBWAV", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRLBWAV = "Lending rates; Large business; Weighted-average rate on credit outstanding; Variable. Units: Per cent per annum; Series ID: FILRLBWAV") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRLBWAV=mean(F05_FILRLBWAV)) %>% mutate(date = zoo::as.yearqtr(date))    
+
+		'Lending rates; Small business; Variable; Term
+		F05_FILRSBVRT<- Quandl("RBA/F05_FILRSBVRT", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRSBVRT = "Lending rates; Small business; Variable; Term. Units: Per cent per annum; Series ID: FILRSBVRT") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRSBVRT=mean(F05_FILRSBVRT)) %>% mutate(date = zoo::as.yearqtr(date))    
 		
 		'Real Trade Weighted Index
 		F15_FRERTWI <- Quandl("RBA/F15_FRERTWI", type="raw") %>% mutate(Date = zoo::as.yearqtr(Date)) %>% arrange(Date) %>% rename(date = Date) %>% rename(F15_FRERTWI = "Real trade-weighted index. Units: Index; March 1995 = 100; Series ID: FRERTWI")
@@ -219,7 +222,7 @@ xon
 ' Join series together at a Qtly Frequency
 '------------------------------------------------------------------------------------------------------------------------------------------------
 
-xrun MARTIN_data <- list(R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRLBWAV, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
+xrun MARTIN_data <- list(R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRSBVRT, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
 
 xoff
 
@@ -427,7 +430,7 @@ copy(c=a) SOI\SOI Rqtly\*
 		'Mortgage Rate
 		rename f05_filrhlbvs NMR
 		'Business Rate
-		rename F05_FILRLBWAV NBR
+		rename F05_FILRSBVRT NBR
 	
 	'Credit
 		'Business Credit (SA)	
