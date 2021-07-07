@@ -166,6 +166,9 @@ xon
 		
 		'Interbank Overnight Cash Rate - Monthly
 		F01_1_FIRMMCRI <- Quandl("RBA/F01_1_FIRMMCRI", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F01_1_FIRMMCRI = "Interbank Overnight Cash Rate. Units: Per cent; Series ID: FIRMMCRI") %>%  group_by(date=floor_date(date, "quarter")) %>% summarize(F01_1_FIRMMCRI=mean(F01_1_FIRMMCRI)) %>% mutate(date = zoo::as.yearqtr(date))    
+
+		'Cash Rate Target; monthly average
+		F01_1_FIRMMCRT <- Quandl("RBA/F01_1_FIRMMCRT", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F01_1_FIRMMCRT = "Cash Rate Target. Units: Per cent; Series ID: FIRMMCRT") %>%  group_by(date=floor_date(date, "quarter")) %>% summarize(F01_1_FIRMMCRT=mean(F01_1_FIRMMCRT)) %>% mutate(date = zoo::as.yearqtr(date))    
     		
 		'Lending rates; Housing loans; Banks; Variable; Standard; Owner-occupier. Units: Monthly
 		F05_FILRHLBVS <- Quandl("RBA/F05_FILRHLBVS", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRHLBVS = "Lending rates; Housing loans; Banks; Variable; Standard; Owner-occupier. Units: Per cent per annum; Series ID: FILRHLBVS") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRHLBVS=mean(F05_FILRHLBVS)) %>% mutate(date = zoo::as.yearqtr(date))    
@@ -222,7 +225,10 @@ xon
 ' Join series together at a Qtly Frequency
 '------------------------------------------------------------------------------------------------------------------------------------------------
 
-xrun MARTIN_data <- list(R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRSBVRT, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
+xrun workfile = data.frame(matrix(vector(), 562, 1,dimnames=list(c(), c("blank"))),stringsAsFactors=F)
+xrun workfile$date <- yearqtr(1959 + seq(2, 563)/4)
+
+xrun MARTIN_data <- list(workfile, R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F01_1_FIRMMCRT, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRSBVRT, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
 
 xoff
 
@@ -422,7 +428,9 @@ copy(c=a) SOI\SOI Rqtly\*
 	
 	'Interest Rates
 		'Cash Rate
-		rename f01_1_firmmcri NCR
+		rename f01_1_firmmcrt NCR
+		'Interbank Overnight Cash Rate
+		rename f01_1_firmmcri NCR_hist
 		'10yr bond yield
 		rename F02_1_FCMYGBAG10 N10R	
 		'2yr bond yield

@@ -164,7 +164,7 @@ smpl @first %eq_est_end
 	MARTIN.append @IDENTITY ib  = ibre  + ibn
 
 	'Cost of Capital
-	MARTIN.append @IDENTITY ibcr  = (rbr/100+ibndra/100)*((1-ibctr*(ibndra/100*(1+n10r/100)/(n10r/100+ibndra/100)))/(1-ibctr))*(pibn/pgne)
+	MARTIN.append @IDENTITY ibcr  = @recode((rbr/100+ibndra/100)*((1-ibctr*(ibndra/100*(1+n10r/100)/(n10r/100+ibndra/100)))/(1-ibctr))*(pibn/pgne)>0.01,(rbr/100+ibndra/100)*((1-ibctr*(ibndra/100*(1+n10r/100)/(n10r/100+ibndra/100)))/(1-ibctr))*(pibn/pgne),0.01)
 	'Corporate Tax Rate
 	MARTIN.append ibctr  = ibctr(-1)
 	MARTIN.addassign(i,c) IBCTR
@@ -385,6 +385,7 @@ smpl @first %eq_est_end
 	equation _PM.LS D(LOG(PM)) = C(1) + C(2)*(LOG(PM(-1)) - C(3)*LOG(WPX(-1)) + LOG(NTWI(-1)) - (1-C(3))*LOG(WPOIL(-1)) - C(4)*TADP ) + C(5)*D(LOG(PM(-1))) + C(6)*D(LOG(NTWI)) + C(7)*D(LOG(NTWI(-1))) + C(8)*D(LOG(WPX)) + C(9)*D(LOG(WPX(-1))) + C(10)*D(LOG(POIL)) + (1 - C(5) - C(8) - C(9) - C(10))*D(LOG(POIL(-1))) + C(12)*D_AFC1 + C(13)*D_AFC2 + C(14)*D_AFC3 + C(15)*D_AFC4 + C(16)*D_AFC5
 	MARTIN.merge _PM
 	MARTIN.addassign(i,c) PM
+
 	'Consumer good import price
 	smpl 1984q1 %eq_est_end
 	equation _PMCG.LS(COV=HAC) D(LOG(PMCG)) = C(2)*D(LOG(PM)) + (1-C(2)-C(3)-C(4))*D(LOG(PMCG(-1))) + C(3)*D(LOG(POIL)) + C(4)*D(LOG(POIL(-1))) + C(5)*D_CPMCG
@@ -450,6 +451,7 @@ smpl @first %eq_est_end
 
 	'Gross Domestic Product Deflator
 	MARTIN.append @IDENTITY py  = ny  * 100  / y
+
 	'Resource Export Deflator
 	smpl 1985q1 %eq_est_end
 	equation _PXRE.LS(COV=HAC) D(LOG(PXRE))=C(1)+C(99)* (LOG(PXRE(-1))- LOG(WPCOM(-1))+LOG(NUSD(-1))) +C(31)*D(LOG(NUSD))+C(41)*D(LOG(WPCOM)) + (1 - C(41))*PI_E(-1)/400
@@ -461,6 +463,7 @@ smpl @first %eq_est_end
 	equation _PXM.LS(COV=HAC) D(LOG(PXM))=C(1)+C(99)*(LOG(PXM(-1))-LOG(PM(-1))- C(3)*PXM_TREND/100)+C(4)*D(LOG(PM))+(1-C(4))*PI_E(-1)/400
 	MARTIN.merge _PXM
 	MARTIN.addassign(i,c) PXM
+
 	'Exports Services Deflator
 	smpl 1985q1 %eq_est_end
 	equation _PXS.LS(COV=HAC) D(LOG(PXS))=C(1)+C(99)*( LOG(PXS(-1))-1*LOG(PC(-1))-(1-1)*LOG(PM(-1))- C(3)*PXS_TREND_1/100- C(4)*PXS_TREND_2/100)+C(31)*D(LOG(PC))+(1 - C(31))*D(LOG(PXS(-1)))
@@ -472,6 +475,7 @@ smpl @first %eq_est_end
 	equation _PXO.LS(COV=HAC) D(LOG(PXO))=C(1)+C(99)*(LOG(PXO(-1)) -C(2)*LOG(PC(-1))-(1-C(2))*(LOG(WPCOM(-1))-LOG(NUSD(-1)))) + C(3)*D(LOG(PC)) + (1-C(3))*(DLOG(WPCOM)-DLOG(NUSD))
 	MARTIN.merge _PXO
 	MARTIN.addassign(i,c) PXO
+
 	'Exports Agricultural Deflator
 	smpl 1985q2 %eq_est_end
 	equation _PXAG.LS(COV=HAC) D(LOG(PXAG))=C(1)+C(99)*(LOG(PXAG(-1))- 1*LOG(WPAG(-1))+1*LOG(NUSD) )+C(31)*D(LOG(NUSD))+C(41)*D(LOG(WPAG)) + C(42)*D(LOG(WPAG(-1))) + (1 - C(41) - C(42))*PI_E(-1)/400
@@ -521,6 +525,7 @@ smpl @first %eq_est_end
 	'Labor Force Participation Rate
 	MARTIN.append lpr  = lf  / lpop  * 100
 	MARTIN.addassign(i,c) LPR
+
 	'Working Age Population
 	MARTIN.append d(log(lpop))  = tdllpop  - 0.005  * (log(lpop(-1))  - tllpop(-1))
 	MARTIN.addassign(i,c) LPOP
@@ -530,23 +535,23 @@ smpl @first %eq_est_end
 '------------------------------------------------------------------------------------------------------------------------------------------------------
 '------------------------------------------------------------------------------------------------------------------------------------------------------
 'Nominal Cash Rate
-	MARTIN.append ncr  = 0.7  * ncr(-1)  + 0.3  * ( rstar  + (ptm  / ptm(-4)  * 100  - 100)  + (tr_ptm  - 1)  * (ptm  / ptm(-4)  * 100  - 100  - pi_target)  - tr_lurgap  * lurgap)  - tr_dlur  / 2  * (lur  - lur(-2))
+	MARTIN.append ncr  = @recode(0.7  * ncr(-1)  + 0.3  * ( rstar  + (ptm  / ptm(-4)  * 100  - 100)  + (tr_ptm  - 1)  * (ptm  / ptm(-4)  * 100  - 100  - pi_target)  - tr_lurgap  * lurgap)  - tr_dlur  / 2  * (lur  - lur(-2))>0.1,0.7  * ncr(-1)  + 0.3  * ( rstar  + (ptm  / ptm(-4)  * 100  - 100)  + (tr_ptm  - 1)  * (ptm  / ptm(-4)  * 100  - 100  - pi_target)  - tr_lurgap  * lurgap)  - tr_dlur  / 2  * (lur  - lur(-2)),0.1)
 	MARTIN.addassign(i,c) ncr
 
 'Real Cash Rate
 	MARTIN.append @identity rcr  = ((1  + ncr  / 100)  / (1  + ptm  / ptm(-4)  - 1))  * 100  - 100
 'Nominal 2year Bond Yield
 	smpl 1993q1 %eq_est_end
-	equation _N2R.LS N2R= (1-C(1))*(C(2)+ RSTAR+PI_E+0.52*(NCR-RSTAR-PI_E))+C(1)*N2R(-1)
-	MARTIN.merge _N2R
+'	equation _N2R.LS N2R= (1-C(1))*(C(2)+ RSTAR+PI_E+0.52*(NCR-RSTAR-PI_E))+C(1)*N2R(-1)
+	MARTIN.append n2r = @recode(n2r(-1)+d(ncr)>0.01,n2r(-1)+d(ncr),0.01)
 	MARTIN.addassign(i,c) N2R
 
 'Real 2year Bond Yield
 	MARTIN.append @IDENTITY r2r  = ((1  + n2r  / 100)  / (1  + ptm  / ptm(-4)  - 1))  * 100  - 100
 'Nominal 10year Bond Yield
 	smpl 1993q1 %eq_est_end
-	equation _N10R.LS(COV=HAC) N10R = C(1)*N10R(-1)+(1-C(1))*(C(2)+RSTAR+PI_E+0.25*(NCR-PI_E-RSTAR))
-	MARTIN.merge _N10R
+'	equation _N10R.LS(COV=HAC) N10R = C(1)*N10R(-1)+(1-C(1))*(C(2)+RSTAR+PI_E+0.25*(NCR-PI_E-RSTAR))
+	MARTIN.append n10r = @recode(n10r(-1)+d(ncr)>0.01,n10r(-1)+d(ncr),0.01)
 	MARTIN.addassign(i,c) N10R
 
 'Nominal Business Rate

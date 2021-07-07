@@ -26,6 +26,18 @@ smpl @all
 
 	smpl @all
 
+'Splice Back Cash Rate using Interbank Series
+	!obs = @obs(ncr)
+	smpl if ncr<>na
+	%firstdate = @otods(1)
+
+	for !i=1 to (@dtoo(%firstdate)-1) 	
+		smpl %firstdate-!i %firstdate-!i 
+		ncr=ncr(+1)*ncr_hist/ncr_hist(+1)
+	next
+
+	smpl @all
+
 'Adjust PEX for RBA Adjustments in 07q4 -> 10q3
 smpl 2007q4 2010q3
 PEX =  PEX_MARTIN/PEX_MARTIN(-1)*100-100
@@ -694,5 +706,4 @@ smpl @all
 
 'Save Workfile After Modifying Data
 wfsave .\..\output\modifieddata.wf1
-
 
