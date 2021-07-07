@@ -14,7 +14,7 @@ cd %path
 %solve_end="2099q4"
 !solve_stop = @val(%solve_end)
 %eq_est_end = "2019q4" 'last period of sample for equation estimation
-%NATACCS_end="2020q4" 'last quarter of national accounts data
+%NATACCS_end="2021q1" 'last quarter of national accounts data
 %modelname="MARTIN"
 
 '**********************************************************************************************
@@ -28,6 +28,7 @@ cd %path
 !test_identities = 0 'test identities hold in the historical period (add-factors on identities = 0)
 !test_convergence = 0 'test convergence properties of LR forecast (eg. does growth = potential growth)
 !run_sims = 0 'run scenarios of model endogenous variables
+!fcst_table = 1 'create a SMP style forecast table
 
 '**********************************************************************************************
 'Enter API Keys for Downloading Data from Quandl and FRED
@@ -114,4 +115,12 @@ if !run_sims = 1 then
 	include .\programs\run_sims.prg
 	stop
 endif
+
+'****************************************************************************************************
+'Forecast Table
+if !fcst_table = 1 then
+	include .\programs\fcst_table.prg
+	stop
+endif
+
 
