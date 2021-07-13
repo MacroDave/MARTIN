@@ -38,6 +38,16 @@ smpl @all
 
 	smpl @all
 
+'Splice Forward old Business Lending Rate
+	smpl @all
+	!obs = @obs(NBR)
+	smpl if NBR<>na
+	%lastdate=@otods(!obs)
+	smpl %lastdate+1 @last
+	NBR=NBR(-1)+NBR_SPLICE-NBR_SPLICE(-1)
+
+	smpl @all
+
 'Adjust PEX for RBA Adjustments in 07q4 -> 10q3
 smpl 2007q4 2010q3
 PEX =  PEX_MARTIN/PEX_MARTIN(-1)*100-100
@@ -706,4 +716,5 @@ smpl @all
 
 'Save Workfile After Modifying Data
 wfsave .\..\output\modifieddata.wf1
+
 

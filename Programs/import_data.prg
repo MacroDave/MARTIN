@@ -186,7 +186,14 @@ xon
 		FXRTWI <- Quandl("RBA/FXRTWI", type="raw") %>% rename(FXRTWI = Value) %>% group_by(date=floor_date(Date, "quarter")) %>% summarize(FXRTWI=mean(FXRTWI)) %>% mutate(date = zoo::as.yearqtr(date))
 		
 		'Weighted Average Business Lending Rate 'qtly - #### NO LONGER UPDATED ON RBA WEBSITE ####
-'		F05_FILRLBWAV <- Quandl("RBA/F05_FILRLBWAV", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRLBWAV = "Lending rates; Large business; Weighted-average rate on credit outstanding; Variable. Units: Per cent per annum; Series ID: FILRLBWAV") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRLBWAV=mean(F05_FILRLBWAV)) %>% mutate(date = zoo::as.yearqtr(date))    
+		F05_FILRLBWAV <- Quandl("RBA/F05_FILRLBWAV", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRLBWAV = "Lending rates; Large business; Weighted-average rate on credit outstanding; Variable. Units: Per cent per annum; Series ID: FILRLBWAV") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRLBWAV=mean(F05_FILRLBWAV)) %>% mutate(date = zoo::as.yearqtr(date))    
+
+		'Lending rates; Business finance; Outstanding; Large business; Total
+		F07_FLRBFOLBT <- read_rba(series_id = "FLRBFOLBT") 
+		F07_FLRBFOLBT %>% dplyr::select(date, series_id, value)
+		F07_FLRBFOLBT <- distinct(F07_FLRBFOLBT,date,series_id, .keep_all= TRUE)
+		F07_FLRBFOLBT <- dcast(F07_FLRBFOLBT, date ~ series_id)
+		F07_FLRBFOLBT <- F07_FLRBFOLBT %>% group_by(date=floor_date(date, "quarter")) %>% summarize(FLRBFOLBT=mean(FLRBFOLBT)) %>% mutate(date = zoo::as.yearqtr(date))
 
 		'Lending rates; Small business; Variable; Term
 		F05_FILRSBVRT<- Quandl("RBA/F05_FILRSBVRT", type="raw") %>% arrange(Date) %>% rename(date = Date) %>% rename(F05_FILRSBVRT = "Lending rates; Small business; Variable; Term. Units: Per cent per annum; Series ID: FILRSBVRT") %>% group_by(date=floor_date(date, "quarter")) %>% summarize(F05_FILRSBVRT=mean(F05_FILRSBVRT)) %>% mutate(date = zoo::as.yearqtr(date))    
@@ -228,7 +235,7 @@ xon
 xrun workfile = data.frame(matrix(vector(), 562, 1,dimnames=list(c(), c("blank"))),stringsAsFactors=F)
 xrun workfile$date <- yearqtr(1959 + seq(2, 563)/4)
 
-xrun MARTIN_data <- list(workfile, R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F01_1_FIRMMCRT, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRSBVRT, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
+xrun MARTIN_data <- list(workfile, R_5206, R_5302, R_5625, R_6202, R_6345, R_6457, R_6401, R_6416, R_5232, G03_GBONYLD, F01_1_FIRMMCRI, F01_1_FIRMMCRT, F02_1_FCMYGBAG10, F02_1_FCMYGBAG2, F05_FILRHLBVS, F05_FILRLBWAV, F07_FLRBFOLBT, F15_FREREWI, F15_FRERTWI, D02_DLCACS, D02_DLCACBS, FXRTWI, FXRUSD, G01_GCPIOCPMTMQP, G01_GCPIXVIQP, R_1364, R_g3, G01_GCPIEITCQP) %>% Reduce(function(dtf1,dtf2) left_join(dtf1,dtf2,by="date"), .)
 
 xoff
 
@@ -437,8 +444,10 @@ copy(c=a) SOI\SOI Rqtly\*
 		rename F02_1_FCMYGBAG2 N2R
 		'Mortgage Rate
 		rename f05_filrhlbvs NMR
-		'Business Rate
-		rename F05_FILRSBVRT NBR
+		'Business Rate (old)
+		rename F05_FILRLBWAV NBR
+		'Business Rate (new)
+		rename FLRBFOLBT NBR_SPLICE
 	
 	'Credit
 		'Business Credit (SA)	
